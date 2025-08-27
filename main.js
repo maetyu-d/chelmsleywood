@@ -2,8 +2,12 @@ import world, {initWorld} from './world.js';
 import {rseed} from './rng.js';
 import {Player} from './entities.js';
 import {giveStartItems, equip} from './items.js';
-import {draw, updateHUD, log, setSeed, setRegionText, setEventText} from './ui.js';
+import {initUI, draw, updateHUD, log, setSeed, setRegionText, setEventText} from './ui.js';
 import {stepFOV, tryMove, waitTurn, endTurn} from './systems.js';
+
+
+// Ensure UI is ready before first draw
+initUI();
 
 
 const rnd = rseed(String(Date.now()>>>0));
