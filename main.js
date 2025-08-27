@@ -1,41 +1,82 @@
-import world, {initWorld} from './world.js';
-import {rseed} from './rng.js';
-import {Player} from './entities.js';
-import {giveStartItems, equip} from './items.js';
-import {initUI, draw, updateHUD, log, setSeed, setRegionText, setEventText} from './ui.js';
-import {stepFOV, tryMove, waitTurn, endTurn} from './systems.js';
+import world, {TILESIZE, tileAt, isExplored, regionAt} from './world.js';
+canvas = document.getElementById('view');
+if(!canvas) throw new Error('Canvas #view not found');
+ctx = canvas.getContext('2d');
+}
 
 
-// Ensure UI is ready before first draw
-initUI();
+export function draw(state){ if(!canvas||!ctx) initUI(); const {player, vis} = state; const w=canvas.width, h=canvas.height; ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+const tilesX=Math.floor(w/TILESIZE), tilesY=Math.floor(h/TILESIZE);
+const offX = player.x - Math.floor(tilesX/2), offY = player.y - Math.floor(tilesY/2);
+for(let y=0;y<tilesY;y++) for(let x=0;x<tilesX;x++){
+const wx=offX+x, wy=offY+y; const key=wx+","+wy; const seen=vis.has(key); const mem=isExplored(wx,wy); if(!seen && !mem) continue;
+const t = tileAt(wx,wy); const c = tileColor(t);
+ctx.fillStyle=seen?c:shade(c,0.45); ctx.fillRect(x*TILESIZE,y*TILESIZE,TILESIZE,TILESIZE);
+}
+// entities would be drawn here; for brevity, we draw player only
+ctx.fillStyle='#8be9fd'; ctx.fillRect(Math.floor(tilesX/2)*TILESIZE, Math.floor(tilesY/2)*TILESIZE, TILESIZE, TILESIZE);
+}
+function tileColor(t){ switch(t){
+case TILE.ROAD: return COLORS.road; case TILE.WALL: return COLORS.wall; case TILE.WATER: return COLORS.water; case TILE.RAD: return COLORS.rad;
+case TILE.LOCKER: return COLORS.locker; case TILE.ALTAR: return COLORS.altar; case TILE.TRADER: return COLORS.trader; case TILE.ROUNDABOUT: return COLORS.round;
+case TILE.MALL: return COLORS.mall; case TILE.SILO: return COLORS.silo; case TILE.SCRAP: return COLORS.scrap; case TILE.DOOR: return COLORS.door; default:return COLORS.floor; }
+}
+function shade(hex, f){ // simple shade multiply
+const c=parseInt(hex.slice(1),16); const r=c>>16, g=(c>>8)&255, b=c&255; const r2=Math.floor(r*f), g2=Math.floor(g*f), b2=Math.floor(b*f); return `#${(r2<<16|g2<<8|b2).toString(16).padStart(6,'0')}`;
+}
+export function updateHUD(player){
+const hp=(player.hp/player.maxhp)*100; const mask=(player.maskFilter/400)*100; const hun=(player.hunger/400)*100;
+setBar('hpBar',hp); setBar('filterBar',mask); setBar('hungerBar',hun);
+setText('hpText',`${player.hp}/${player.maxhp}`);
+setText('filterText',`${player.maskFilter}`);
+setText('hungerText',`${player.hunger}`);
+setText('sightText',player.sees);
+}
+export function setRegionText(player){ const reg=regionAt(player.x,player.y); document.getElementById('regionText').textContent=reg; }
+export function setEventText(world){ document.getElementById('eventText').textContent=world.event.kind||'—'; }
+function setBar(id,val){ const el=document.getElementById(id); if(!el) return; el.style.width=Math.max(0,Math.min(100,val))+"%"; }
+function setText(id,txt){ const el=document.getElementById(id); if(el) el.textContent=txt; }
+export function log(msg, dim=false){ const el=document.getElementById('log'); if(!el) return; const p=document.createElement('div'); if(dim) p.className='dim'; p.textContent=msg; el.appendChild(p); el.scrollTop=el.scrollHeight; }
+export function setSeed(str){ const el=document.getElementById('seedStr'); if(el) el.textContent=str; }
+```js
+import world, {TILESIZE, tileAt, isExplored, regionAt} from './world.js';
+import {COLORS, TILE} from './consts.js';
 
 
-const rnd = rseed(String(Date.now()>>>0));
-const player = new Player(0,0); giveStartItems(player); equip(player,'gasmask');
+const canvas = document.getElementById('view');
+const ctx = canvas.getContext('2d');
 
 
-initWorld('chelmsley-'+Math.floor(rnd()*1e9));
-setSeed(world.seed);
-
-
-let vis = stepFOV(player);
-updateHUD(player); setRegionText(player); setEventText(world);
-
-
-function render(){ draw({player,vis}); updateHUD(player); setRegionText(player); setEventText(world); }
-render();
-
-
-function end(){ endTurn(player,log,rnd); vis = stepFOV(player); render(); }
-
-
-window.addEventListener('keydown', (e)=>{
-const k=e.key; let acted=false;
-if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','a','d','w','s','h','j','k','l'].includes(k)){
-const d = k==='ArrowLeft'||k==='a'||k==='h' ? [-1,0]
-: k==='ArrowRight'||k==='d'||k==='l' ? [1,0]
-: k==='ArrowUp'||k==='w'||k==='k' ? [0,-1] : [0,1];
-acted = tryMove(player,d[0],d[1],log);
-} else if(k==='.' ){ waitTurn(log); acted=true; }
-if(acted){ e.preventDefault(); end(); }
-});
+export function draw(state){ const {player, vis} = state; const w=canvas.width, h=canvas.height; ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+const tilesX=Math.floor(w/TILESIZE), tilesY=Math.floor(h/TILESIZE);
+const offX = player.x - Math.floor(tilesX/2), offY = player.y - Math.floor(tilesY/2);
+for(let y=0;y<tilesY;y++) for(let x=0;x<tilesX;x++){
+const wx=offX+x, wy=offY+y; const key=wx+","+wy; const seen=vis.has(key); const mem=isExplored(wx,wy); if(!seen && !mem) continue;
+const t = tileAt(wx,wy); const c = tileColor(t);
+ctx.fillStyle=seen?c:shade(c,0.45); ctx.fillRect(x*TILESIZE,y*TILESIZE,TILESIZE,TILESIZE);
+}
+// entities would be drawn here; for brevity, we draw player only
+ctx.fillStyle='#8be9fd'; ctx.fillRect(Math.floor(tilesX/2)*TILESIZE, Math.floor(tilesY/2)*TILESIZE, TILESIZE, TILESIZE);
+}
+function tileColor(t){ switch(t){
+case TILE.ROAD: return COLORS.road; case TILE.WALL: return COLORS.wall; case TILE.WATER: return COLORS.water; case TILE.RAD: return COLORS.rad;
+case TILE.LOCKER: return COLORS.locker; case TILE.ALTAR: return COLORS.altar; case TILE.TRADER: return COLORS.trader; case TILE.ROUNDABOUT: return COLORS.round;
+case TILE.MALL: return COLORS.mall; case TILE.SILO: return COLORS.silo; case TILE.SCRAP: return COLORS.scrap; case TILE.DOOR: return COLORS.door; default:return COLORS.floor; }
+}
+function shade(hex, f){ // simple shade multiply
+const c=parseInt(hex.slice(1),16); const r=c>>16, g=(c>>8)&255, b=c&255; const r2=Math.floor(r*f), g2=Math.floor(g*f), b2=Math.floor(b*f); return `#${(r2<<16|g2<<8|b2).toString(16).padStart(6,'0')}`;
+}
+export function updateHUD(player){
+const hp=(player.hp/player.maxhp)*100; const mask=(player.maskFilter/400)*100; const hun=(player.hunger/400)*100;
+setBar('hpBar',hp); setBar('filterBar',mask); setBar('hungerBar',hun);
+setText('hpText',`${player.hp}/${player.maxhp}`);
+setText('filterText',`${player.maskFilter}`);
+setText('hungerText',`${player.hunger}`);
+setText('sightText',player.sees);
+}
+export function setRegionText(player){ const reg=regionAt(player.x,player.y); document.getElementById('regionText').textContent=reg; }
+export function setEventText(world){ document.getElementById('eventText').textContent=world.event.kind||'—'; }
+function setBar(id,val){ const el=document.getElementById(id); el.style.width=Math.max(0,Math.min(100,val))+"%"; }
+function setText(id,txt){ document.getElementById(id).textContent=txt; }
+export function log(msg, dim=false){ const el=document.getElementById('log'); const p=document.createElement('div'); if(dim) p.className='dim'; p.textContent=msg; el.appendChild(p); el.scrollTop=el.scrollHeight; }
+export function setSeed(str){ document.getElementById('seedStr').textContent=str; }
