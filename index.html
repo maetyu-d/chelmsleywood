@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chelmsley World — roguelike</title>
+<link rel="preload" href="style.css" as="style">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+<nav>
+<a href="manual.html" target="_blank">Manual</a>
+<a href="credits.html" target="_blank">Credits/Lore</a>
+</nav>
+<div class="title">CHELMSLEY WORLD</div>
+<div class="seed">seed: <span id="seedStr"></span></div>
+</header>
+
+
+<main class="layout">
+<section class="game">
+<canvas id="view" width="960" height="640"></canvas>
+<div id="overlay" class="overlay hidden"></div>
+<div id="minigame" class="minigame hidden" role="dialog" aria-modal="true"></div>
+</section>
+<aside class="hud">
+<div class="panel">
+<div class="row"><span>HP</span><div class="bar"><div id="hpBar"></div></div><span id="hpText"></span></div>
+<div class="row"><span>Mask</span><div class="bar"><div id="filterBar"></div></div><span id="filterText"></span></div>
+<div class="row"><span>Hunger</span><div class="bar"><div id="hungerBar"></div></div><span id="hungerText"></span></div>
+<div class="row"><span>Sight</span><span id="sightText"></span></div>
+<div class="row"><span>Region</span><span id="regionText"></span></div>
+<div class="row"><span>Event</span><span id="eventText"></span></div>
+<div class="row"><span>Reputation</span><span id="repText"></span></div>
+</div>
+
+
+<div class="panel inv">
+<h3>Inventory</h3>
+<ul id="invList" class="list"></ul>
+<div class="btns">
+<button id="btnUse">Use</button>
+<button id="btnDrop">Drop</button>
+<button id="btnEquip">Equip</button>
+<button id="btnCraft">Craft</button>
+</div>
+</div>
+
+
+<div class="panel log">
+<h3>Log</h3>
+<div id="log" class="logBody" aria-live="polite" aria-atomic="false"></div>
+</div>
+</aside>
+</main>
+
+
+<footer class="footer">Strict roguelike: turn‑based • grid • LOS • procedural • permadeath. WASD/HJKL or arrows to move. Period to wait. G pick up. I inventory. T trade. C craft. M toggle map memory. R run (loud). F flashlight ping (noise). Q to commit to a new run on death.</footer>
+
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
