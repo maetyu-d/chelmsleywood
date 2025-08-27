@@ -1,0 +1,38 @@
+:root{
+--bg:#0b0d0f; --fg:#d6e1e5; --dim:#7f8a90; --hi:#8be9fd; --acc:#50fa7b;
+--hp:#ff5555; --mask:#bd93f9; --hun:#f1fa8c; --card:#13161a; --panel:#0f1215;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,Segoe UI,Roboto,Ubuntu,sans-serif}
+.topbar{display:flex;gap:1rem;align-items:center;justify-content:space-between;padding:.5rem 1rem;background:#090b0d;border-bottom:1px solid #222}
+.topbar a{color:var(--hi);text-decoration:none}
+.title{letter-spacing:.2em}
+.layout{display:grid;grid-template-columns: minmax(640px,1fr) 360px;gap:8px;padding:8px}
+.game{position:relative;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #222}
+#view{display:block;width:100%;height:auto;image-rendering:pixelated}
+.overlay,.minigame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(2px)}
+.hidden{display:none}
+.hud{display:flex;flex-direction:column;gap:8px}
+.panel{background:var(--panel);border:1px solid #1c2127;border-radius:12px;padding:10px}
+.panel h3{margin:.2rem 0 .6rem;color:var(--hi)}
+.row{display:flex;align-items:center;gap:.5rem;margin:.2rem 0}
+.bar{flex:1;background:#171a1f;border-radius:6px;overflow:hidden;height:8px}
+.bar>div{height:100%;width:0}
+#hpBar{background:var(--hp)}
+#filterBar{background:var(--mask)}
+#hungerBar{background:var(--hun)}
+.list{list-style:none;margin:0;padding:0;max-height:160px;overflow:auto}
+.list li{padding:2px 4px;border-radius:6px}
+.list li.sel{background:#1e242b}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.btns button{background:#1a1f25;border:1px solid #28303a;color:var(--fg);padding:6px;border-radius:8px;cursor:pointer}
+.logBody{height:180px;overflow:auto;background:#0b0e12;border-radius:8px;padding:6px;white-space:pre-wrap}
+.logBody .dim{color:var(--dim)}
+.footer{padding:.5rem 1rem;color:var(--dim);border-top:1px solid #222}
+.doc{max-width:880px;margin:2rem auto;padding:0 1rem}
+.minigame .box{background:var(--card);padding:16px;border-radius:12px;border:1px solid #26303a;width:min(560px,90vw)}
+.minigame .meter{position:relative;height:20px;background:#0f1419;border-radius:6px;margin:8px 0;overflow:hidden}
+.minigame .target{position:absolute;height:100%;top:0}
+.minigame .cursor{position:absolute;top:0;bottom:0;width:2px;background:#fff}
+.minigame .hint{color:var(--dim)}
